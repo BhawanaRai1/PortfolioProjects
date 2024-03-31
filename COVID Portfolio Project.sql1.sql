@@ -47,6 +47,7 @@ Where continent is not null
 Group by location
 Order by TotalDeathCount DESC;
 
+
 -- BREAKING THINGS DOWN BY CONTINENT
 
 --Showing continents with the highest death count per population
@@ -109,32 +110,34 @@ From PopvsVac;
 
 
 
---TEMP TABLE
+--Using TEMP TABLE to perform Calculation on Partition By in previous query
+Drop Table if exists #PercentPopulationVaccinated
+	Create Table #PercentPopulationVaccinated
+	(
+	Continent nvarchar (250),
+	Location nvarchar (250),
+	Data date,
+	Population numeric,
+	New_vaccination numeric,
+	RollingPeopleVaccinated numeric 
+	)
 
-
+Insert into  #PercentPopulationVaccinated
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
+	SUM (CONVERT(int, vac.new_vaccinations)) OVER ( Partition by dea.location ORDER BY dea.location, dea.date) as RollingPeopleVaccinated
+From PortfolioProject..CovidDeaths$ dea
+Join PortfolioProject..CovidVaccinations vac
+     On dea.location =vac.location
      And dea.date= vac.date
 Where dea.continent is not null
+	
 
 Select *, (RollingPeopleVaccinated/Population)*100 as PeopleVaccinatedPercentage
 From #PercentagePopulationVaccinated;
 
 
---Creating view to store data for later visualizationsDROP Table if exists #PercentPopulationVaccinated
-Create TablE #PercentagePopulationVaccinated
-(Continent nvarchar (300),
-Location nvarchar (300),
-Date date,
-Population numeric,
-New_vaccination numeric,
-RollingPeopleVaccinated numeric)
 
-
-Insert into #PercentagePopulationVaccinated
-Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
-SUM (CONVERT(int, vac.new_vaccinations)) OVER ( Partition by dea.location ORDER BY dea.location, dea.date) as RollingPeopleVaccinated
-From PortfolioProject..CovidDeaths$ dea
-Join PortfolioProject..CovidVaccinations vac
-     On dea.location =vac.location
+--Creating view to store data for later visualizations
 
 Create View PercentagePopulationVaccinated as
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
@@ -143,8 +146,4 @@ From PortfolioProject..CovidDeaths$ dea
 Join PortfolioProject..CovidVaccinations vac
      On dea.location =vac.location
      And dea.date= vac.date
-
-
-	 select *
-	 from PercentagePopulationVaccinated;
 Where dea.continent is not null
