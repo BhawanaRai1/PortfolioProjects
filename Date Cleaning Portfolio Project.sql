@@ -132,16 +132,16 @@ ORDER BY 2;
 SELECT SoldAsVacant,
 CASE WHEN SoldAsVacant = 'Y' THEN  'Yes'
      WHEN SoldAsVacant = 'N' THEN 'NO'
-	 ELSE SoldAsVacant
-	 END
+     ELSE SoldAsVacant
+     END
 FROM PortfolioProject..NashvilleHousing
 
 
 UPDATE PortfolioProject..NashvilleHousing
 SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN  'Yes'
      WHEN SoldAsVacant = 'N' THEN 'NO'
-	 ELSE SoldAsVacant
-	 END
+     ELSE SoldAsVacant
+     END
 
 
 	 -----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -150,12 +150,12 @@ SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN  'Yes'
  WITH RowNumCTE AS (
  SELECT *,
       ROW_NUMBER () OVER (
-	  PARTITION BY ParcelID,
-	               PropertyAddress,
-	               SaleDate,
-				   SalePrice,
-				   LegalReference
-				   ORDER BY UniqueID) as Row_num
+      PARTITION BY ParcelID,
+	           PropertyAddress,
+	           SaleDate,
+		   SalePrice,
+		   LegalReference
+		   ORDER BY UniqueID) as Row_num
 
  FROM PortfolioProject..NashvilleHousing )
 
